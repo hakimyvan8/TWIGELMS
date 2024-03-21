@@ -1,0 +1,18 @@
+.square {
+    width: full;
+    height: 100px;
+    border-radius: 0;
+}
+.button_length {
+    width: 100%;
+}
+.text-style {
+    text-align: center;
+    padding: 15px;
+}
+
+
+.jumbotron {
+    background-image: linear-gradient(to right, #0c2ccf, #000000);
+    color: #ffffff
+}
