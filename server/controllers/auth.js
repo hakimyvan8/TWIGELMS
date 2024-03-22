@@ -1,6 +1,16 @@
 import User from '../models/user'
 import { hashPassword, comparePassword } from '../utils/auth'
 import jwt from 'jsonwebtoken';
+import AWS from 'aws-sdk';
+
+const awsConfig = {
+    accessKeyid:process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_AWS_REGION,
+    apiVersion: process.env.AWS_API_VERSION,
+};
+
+const SES  = new AWS.SES(awsConfig);
 
 export const register = async (req, res) => {
     try {
@@ -103,4 +113,47 @@ export const currentUser = async (req, res) => {
     } catch(err) {
         console.log(err)
     }
-}
+};
+
+export const sendTestEmail = async (req, res) => {
+    // console.log('send email using SES');
+    // res.json({ok: true});
+
+    //Basically here we're going to define the parameters that we're going to send to the SES service. from where we're sending the email to which email address
+    //and the message or the information you want to put in the email
+    const params = {
+        Source: process.env.EMAIL_FROM,
+        Destination: {
+            ToAddresses: ['hakizimanayvan8@gmail.com'],
+        },
+
+        ReplyToAddresses: [process.env.EMAIL_FROM],
+        Message: {
+            Body: {
+                Html: {
+                    Charset: 'UTF-8',
+                    Data: `<html>
+                    <h1>Reset Password Email</h1>
+                    <p>Please use the following link to reset your password</p>
+                    </html>`,
+                },
+            },
+            Subject: {
+                Charset: 'UTF-8',
+                Data: 'Password Reset Link',
+            }
+        }
+    };
+
+    //once it the parameters are set, we're going to send the email using AWS SES
+    const emailSent = SES.sendEmail(params).promise();
+
+    emailSent.then((data) => {
+        console.log(data);
+        res.json({ok: true})
+    })
+    .catch(err => {
+        console.log(err);
+    });
+
+};
