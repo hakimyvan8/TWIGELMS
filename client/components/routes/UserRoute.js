@@ -1,8 +1,9 @@
 
-import {useEffect, useState, useContext} from 'react';
-import {Context} from '../../context'; //so when a user logs in here, we should have that user information in the context so we can show that here
+import {useEffect, useState} from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import { SyncOutlined } from '@ant-design/icons';
+
 //in THIS 'USERROUTER' COMPONENT, WE WILL WRAP THE USER PROFILE PAGE, SO THAT ONLY AUTHENTICATED USERS CAN ACCESS THIS PAGE GLOBALLYT THROUGHOUT THE APPLICATION
 //so in here we want to make request to our backend to that endpoint we created in the last video
 //the 'router.get("/current-user", requireSignin, currentUser);' endpoint
@@ -19,8 +20,6 @@ const UserRoute = ({children}) => {
 
     const router = useRouter();
 
-    //we can also access the User context in this function below
-    const {state: {user}} = useContext(Context);
     useEffect(() => {
   
        fetchUser();
@@ -41,7 +40,7 @@ const fetchUser = async () => {
 
     return (
         <>
-        {!ok ? '':<>{children}</>}
+        {!ok ? <SyncOutlined spin className='d-flex justify-content-center display-1 text-primary p-5'/>:<>{children}</>}
         </> 
     )
 }
