@@ -97,6 +97,11 @@ const Login = () => {
                 Not yet Registered? {""}
                 <Link href={'/register'}>Register</Link>
             </p>
+
+
+            <p className='text-center'>
+                <Link href={'/forgot-password'}>Forgot password</Link>
+            </p>
         </div>
         </>
     )

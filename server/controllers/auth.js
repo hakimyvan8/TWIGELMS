@@ -2,6 +2,7 @@ import User from '../models/user'
 import { hashPassword, comparePassword } from '../utils/auth'
 import jwt from 'jsonwebtoken';
 import AWS from 'aws-sdk';
+import {nanoid} from 'nanoid';
 
 const awsConfig = {
     accessKeyid:process.env.AWS_ACCESS_KEY,
@@ -157,3 +158,79 @@ export const sendTestEmail = async (req, res) => {
     });
 
 };
+
+
+export const forgotPassword = async (req, res) => {
+    try {
+        const {email} = req.body;
+
+        //generate a random code using uuid, and save it in the database, so thst we can compare it later
+        const updatedCode = nanoid(6).toUpperCase();
+        // console.log(email);
+
+        //since the forget password is outside the scope of the user signing in in order to access the forgot password function, we can try to query find the user based email, such that we send the code
+         const user = await User.findOneAndUpdate({email}, {passwordResetCode: updatedCode});
+
+         //if the user does not exist
+         if(!user) return res.status(400).send('User not found');
+
+
+         //now we are going to send the email with the code
+            const params = {
+                Source: process.env.EMAIL_FROM,
+                Destination: {
+                    ToAddresses: [email],
+                },
+                Message: {
+                    Body: {
+                        Html: {
+                            Charset: 'UTF-8',
+                            Data: `<html>
+                            <h1>Reset Password Email</h1>
+                            <h1>${updatedCode}</h1>
+                            <p>Please use the following code to reset your password</p>
+                            </html>`,
+                        },
+                    },
+                    Subject: {
+                        Charset: 'UTF-8',
+                        Data: 'Password Reset Code',
+                    }
+                }
+            };
+            //once it the parameters are set, we're going to send the email using AWS SES
+            const emailSent = SES.sendEmail(params).promise();
+            emailSent.then((data) => {
+                console.log(data);
+                res.json({ok: true})
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+    } catch (err) { 
+        console.log(err)
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        //first we're going to find the user based on the email and the code
+        const {email, code, newPassword} = req.body;
+        // console.table({email, code, newPassword});
+        const hashedPassword = await hashPassword(newPassword);
+
+        //so to reset the password we are going to find a user based on the email and the code, and then we're going to update the password with the new password   
+        const user = await User.findOneAndUpdate({
+            email, passwordResetCode: code
+        },
+         {password: hashedPassword, 
+          passwordResetCode: ''}).exec(); //so we're going to reset the password wit the new one which is 'hashed' and also remove the code from the database
+
+        res.json({ok: true});
+
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send('Error, Try again');
+    }
+}

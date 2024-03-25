@@ -5,7 +5,7 @@ const router = express .Router()
 import { requireSignin } from '../middlewares';
 
 //import controllers
-import  {register, login, logout, currentUser, sendTestEmail} from '../controllers/auth'
+import  {register, login, logout, currentUser, sendTestEmail, forgotPassword, resetPassword} from '../controllers/auth';
 
 // the 'register' function is exported from the controller file.
 router.post("/register", register);
@@ -15,6 +15,9 @@ router.get("/current-user", requireSignin, currentUser); //so by the time this m
 //and based on that ID we can query our database, and get the current user.
 
 //lets create a get route to send emails
-router.get("/send-email", sendTestEmail)
+router.get("/send-email", sendTestEmail);
+router.post("/forgot-password", forgotPassword);
 
+//let's add the reset password route
+router.post("/reset-password", resetPassword);
 module.exports = router;
