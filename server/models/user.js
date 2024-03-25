@@ -35,7 +35,13 @@ const userSchema = new Schema({
     stripe_account_id: '',
     stripe_seller: {},
     stripeSession: {},
+    //lets add the password reset object
+    passwordResetCode: {
+    data: String,
+    default: "",
 }, 
+}, 
+
 //the database will automatically create an updated timestamp for any change made
 {timestamps: true}
 );
