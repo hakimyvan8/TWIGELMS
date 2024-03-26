@@ -53,7 +53,7 @@ const Login = () => {
         //set the loading by setting it to false upon submission of the data
 
         //redirect the user to the home page using 'router'
-        router.push('/');
+        router.push('/user');
         // setLoading(false);
     } catch (err) {
         //toast the error response from the data submitted
