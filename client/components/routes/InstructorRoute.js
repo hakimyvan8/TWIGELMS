@@ -3,12 +3,12 @@ import {useEffect, useState} from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { SyncOutlined } from '@ant-design/icons';
-import UserNav from '../nav/UserNav';
+import InstructorNav from '../nav/InstructorNav';
 
 //in THIS 'USERROUTER' COMPONENT, WE WILL WRAP THE USER PROFILE PAGE, SO THAT ONLY AUTHENTICATED USERS CAN ACCESS THIS PAGE GLOBALLYT THROUGHOUT THE APPLICATION
 //so in here we want to make request to our backend to that endpoint we created in the last video
 //the 'router.get("/current-user", requireSignin, currentUser);' endpoint
-const UserRoute = ({children}) => {
+const InstructorRoute = ({children}) => {
 
     //we can set another state here to see if the user info has been loaded or stored
     const [ok, setOk] = useState(false);
@@ -23,19 +23,19 @@ const UserRoute = ({children}) => {
 
     useEffect(() => {
   
-       fetchUser();
+       fetchInstructor();
 
 }, []);
 
-const fetchUser = async () => {
+const fetchInstructor = async () => {
     try {
-        const {data} = await axios.get('/api/current-user');
-        console.log(data);
+        const {data} = await axios.get('/api/current-instructor');
+        console.log("INSTRUCTOR ROUTE =>", data);
        if(data.ok) setOk(true);
     } catch(err) {
         console.log(err);
         setOk(false);
-        router.push('/login');
+        router.push('/');
     }
    };
 
@@ -45,6 +45,7 @@ const fetchUser = async () => {
         <SyncOutlined 
         spin
         className='d-flex justify-content-center display-1 text-primary p-5'
+        //so this will show the loading icon in the center of the page if the user is not authenticated
         />
        ) : (
        
@@ -52,7 +53,7 @@ const fetchUser = async () => {
        <div className='container-fluid'>
         <div className='row'>
             <div className='col-md-2'>
-                <UserNav />
+                <InstructorNav />
             </div>
             <div className='col-md-10'>
                 {children}
@@ -64,4 +65,4 @@ const fetchUser = async () => {
     )
 }
 
-export default UserRoute;
+export default InstructorRoute;
